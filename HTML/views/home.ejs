@@ -1,21 +1,80 @@
 <%- include('partials/header') %>
 
-<h2 id="titulo-pagina">Produtos da Butik</h2>
+<section id="destaque">
+<h2>Encontre seu imóvel com o ImobiFácil</h2>
+<p>Casas, apartamentos e salas para comprar ou alugar em Campinas.</p>
+</section>
 
-<% if (produtos.length === 0) { %>
-  <p id="sem-produtos">Nenhum produto cadastrado.</p>
+<% if (finalidade == 'venda') { %>
+<h2 class="titulo-lista">Imóveis à venda</h2>
+<% } else if (finalidade == 'aluguel') { %>
+<h2 class="titulo-lista">Imóveis para alugar</h2>
 <% } else { %>
-  <div id="produtos">
-    <% produtos.forEach(p => { %>
-      <div>
-        <h3><%= p.produtoNome %></h3>
-        <p>Categoria: <%= p.produtoCategoria %></p>
-        <p>Fornecedor: <%= p.fornecedorNome %></p>
-        <p>Preço: R$ <%= p.produtoPreco %></p>
-        <p>Estoque: <%= p.produtoEstoque %></p>
-      </div>
-    <% }) %>
-  </div>
+<h2 class="titulo-lista">Todos os imóveis</h2>
 <% } %>
+
+<% if (imoveis.length == 0) { %>
+<p class="vazio">Nenhum imóvel encontrado.</p>
+<% } else { %>
+<div id="imoveis">
+<% imoveis.forEach(i => { %>
+<div class="card <%= i.imovelStatus != 'disponivel' ? 'indisponivel' : '' %>">
+    <div class="foto">
+        <% if (i.imovelImagemUrl) { %>
+        <img src="<%= i.imovelImagemUrl %>" alt="<%= i.imovelTitulo %>">
+        <% } else { %>
+        <span>🏠</span>
+        <% } %>
+        <span class="selo <%= i.imovelFinalidade %>"><%= i.imovelFinalidade == 'venda' ? 'Venda' : 'Aluguel' %></span>
+        <% if (i.imovelStatus == 'vendido') { %>
+        <span class="selo fechado">Vendido</span>
+        <% } else if (i.imovelStatus == 'alugado') { %>
+        <span class="selo fechado">Alugado</span>
+        <% } %>
+    </div>
+
+    <div class="info">
+        <p class="tipo"><%= i.imovelTipo %> · <%= i.imovelBairro %></p>
+        <h3><%= i.imovelTitulo %></h3>
+        <p class="preco">
+            <%= Number(i.imovelPreco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %>
+            <% if (i.imovelFinalidade == 'aluguel') { %><small>/mês</small><% } %>
+        </p>
+        <p class="numeros">
+            <span><%= Number(i.imovelArea) %> m²</span>
+            <span><%= i.imovelQuartos %> quartos</span>
+            <span><%= i.imovelBanheiros %> banheiros</span>
+            <span><%= i.imovelVagas %> vagas</span>
+        </p>
+
+        <details>
+            <summary>Ver detalhes</summary>
+            <p class="descricao"><%= i.imovelDescricao %></p>
+
+            <% if (i.comodidades.length > 0) { %>
+            <div class="comodidades">
+                <% i.comodidades.forEach(c => { %>
+                <span><%= c.comodidadeNome %></span>
+                <% }) %>
+            </div>
+            <% } %>
+
+            <div class="contato">
+                <p><strong>Endereço:</strong> <%= i.imovelEndereco %> - <%= i.imovelBairro %></p>
+                <p><strong>Corretor:</strong> <%= i.usuarioNome %></p>
+                <p><strong>Telefone:</strong> <%= i.usuarioTelefone %></p>
+                <p><strong>E-mail:</strong> <%= i.usuarioEmail %></p>
+            </div>
+        </details>
+    </div>
+</div>
+<% }) %>
+</div>
+<% } %>
+
+<section id="sobre">
+<h2>Sobre o ImobiFácil</h2>
+<p>O ImobiFácil é uma imobiliária criada para o projeto de Desenvolvimento Web Dinâmico do IFSP Campinas. Qualquer pessoa pode ver os imóveis disponíveis para compra e aluguel. Os corretores entram na área do corretor para cadastrar, editar e excluir os seus anúncios.</p>
+</section>
 
 <%- include('partials/footer') %>

@@ -14,56 +14,53 @@ config:
     attributeBackgroundColorEven: "#EEF2FF"
 ---
 erDiagram
-    fornecedor ||--o{ produto : fornece
-    cliente ||--o{ pedido : realiza
-    funcionario ||--o{ pedido : atende
-    pedido ||--|{ itemPedido : contem
-    produto ||--o{ itemPedido : esta_em
+    proprietario ||--o{ imovel : possui
+    usuario ||--o{ imovel : anuncia
+    imovel ||--o{ imovelComodidade : tem
+    comodidade ||--o{ imovelComodidade : esta_em
 
-    fornecedor {
-        int fornecedorID PK
-        varchar fornecedorNome
-        varchar fornecedorCnpj
-        varchar fornecedorTelefone
+    usuario {
+        int usuarioID PK
+        varchar usuarioNome
+        varchar usuarioEmail
+        varchar usuarioTelefone
+        varchar usuarioSenha
+        timestamp usuarioCriadoEm
     }
 
-    produto {
-        int produtoID PK
-        varchar produtoNome
-        varchar produtoCategoria
-        int produtoEstoque
-        decimal produtoPreco
-        int produtoFornecedorIDFK FK
+    proprietario {
+        int proprietarioID PK
+        varchar proprietarioNome
+        varchar proprietarioCpf
+        varchar proprietarioTelefone
     }
 
-    cliente {
-        int clienteID PK
-        varchar clienteNome
-        varchar clienteCpf
+    imovel {
+        int imovelID PK
+        varchar imovelTitulo
+        text imovelDescricao
+        varchar imovelTipo
+        enum imovelFinalidade
+        enum imovelStatus
+        decimal imovelPreco
+        decimal imovelArea
+        int imovelQuartos
+        int imovelBanheiros
+        int imovelVagas
+        varchar imovelEndereco
+        varchar imovelBairro
+        varchar imovelImagemUrl
+        timestamp imovelCriadoEm
+        int imovelProprietarioIDFK FK
+        int imovelUsuarioIDFK FK
     }
 
-    funcionario {
-        int funcionarioID PK
-        varchar funcionarioNome
-        varchar funcionarioCPF
-        varchar funcionarioCargo
-        decimal funcionarioSalario
+    comodidade {
+        int comodidadeID PK
+        varchar comodidadeNome
     }
 
-    pedido {
-        int pedidoID PK
-        date pedidoData
-        decimal pedidoValorTotal
-        enum pedidoFormaPagamento
-        int pedidoClienteIDFK FK
-        int pedidoFuncionarioIDFK FK
-    }
-
-    itemPedido {
-        int itemPedidoID PK
-        int itemPedidoQuantidade
-        decimal itemPedidoPrecoUnitario
-        decimal itemPedidoSubTotal
-        int itemPedidoPedidoIDFK FK
-        int itemPedidoProdutoIDFK FK
+    imovelComodidade {
+        int imovelComodidadeImovelIDFK PK, FK
+        int imovelComodidadeComodidadeIDFK PK, FK
     }

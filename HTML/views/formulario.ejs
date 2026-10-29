@@ -1,71 +1,203 @@
 <%- include('partials/header') %>
 
-<h2>Cadastro de Dados</h2>
-<form action="/formulario" method="POST">
+<% if (!usuario) { %>
 
-<label for="fornecedorNome">Nome do Fornecedor:</label><br>
-<input type="text" id="fornecedorNome" name="fornecedorNome"><br><br>
+<h2 class="titulo-lista">Área do corretor</h2>
 
-<label for="fornecedorCnpj">CNPJ do Fornecedor:</label><br>
-<input type="text" id="fornecedorCnpj" name="fornecedorCnpj"><br><br>
+<div class="duas-caixas">
+    <div class="caixa">
+        <h3>Entrar</h3>
+        <form action="/login" method="POST">
+            <label for="loginEmail">E-mail</label>
+            <input type="email" id="loginEmail" name="usuarioEmail" required>
 
-<label for="fornecedorTelefone">Telefone do Fornecedor:</label><br>
-<input type="text" id="fornecedorTelefone" name="fornecedorTelefone"><br><br>
+            <label for="loginSenha">Senha</label>
+            <input type="password" id="loginSenha" name="usuarioSenha" required>
 
-<label for="produtoNome">Nome do Produto:</label><br>
-<input type="text" id="produtoNome" name="produtoNome"><br><br>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
 
-<label for="produtoCategoria">Categoria do Produto:</label><br>
-<input type="text" id="produtoCategoria" name="produtoCategoria"><br><br>
+    <div class="caixa">
+        <h3>Criar conta</h3>
+        <form action="/registro" method="POST">
+            <label for="usuarioNome">Nome</label>
+            <input type="text" id="usuarioNome" name="usuarioNome" required>
 
-<label for="produtoEstoque">Estoque do Produto:</label><br>
-<input type="number" id="produtoEstoque" name="produtoEstoque"><br><br>
+            <label for="usuarioEmail">E-mail</label>
+            <input type="email" id="usuarioEmail" name="usuarioEmail" required>
 
-<label for="produtoPreco">Preço do Produto:</label><br>
-<input type="number" id="produtoPreco" name="produtoPreco"><br><br>
+            <label for="usuarioTelefone">Telefone</label>
+            <input type="text" id="usuarioTelefone" name="usuarioTelefone" required>
 
-<label for="clienteNome">Nome do Cliente:</label><br>
-<input type="text" id="clienteNome" name="clienteNome"><br><br>
+            <label for="usuarioSenha">Senha (mínimo 6 caracteres)</label>
+            <input type="password" id="usuarioSenha" name="usuarioSenha" minlength="6" required>
 
-<label for="clienteCpf">CPF do Cliente:</label><br>
-<input type="text" id="clienteCpf" name="clienteCpf"><br><br>
+            <button type="submit">Cadastrar</button>
+        </form>
+    </div>
+</div>
 
-<label for="funcionarioNome">Nome do Funcionário:</label><br>
-<input type="text" id="funcionarioNome" name="funcionarioNome"><br><br>
+<% } else { %>
 
-<label for="funcionarioCPF">CPF do Funcionário:</label><br>
-<input type="text" id="funcionarioCPF" name="funcionarioCPF"><br><br>
+<div class="topo-painel">
+    <h2 class="titulo-lista">Olá, <%= usuario.nome %>!</h2>
+    <a href="/formulario#cadastro" class="botao">+ Novo imóvel</a>
+</div>
 
-<label for="funcionarioCargo">Cargo do Funcionário:</label><br>
-<input type="text" id="funcionarioCargo" name="funcionarioCargo"><br><br>
+<% if (imoveis.length == 0) { %>
+<p class="vazio">Você ainda não cadastrou nenhum imóvel.</p>
+<% } else { %>
+<div class="tabela">
+<table>
+    <tr>
+        <th>Imóvel</th>
+        <th>Finalidade</th>
+        <th>Proprietário</th>
+        <th>Preço</th>
+        <th>Status</th>
+        <th>Ações</th>
+    </tr>
+    <% imoveis.forEach(i => { %>
+    <tr>
+        <td><%= i.imovelTitulo %></td>
+        <td><span class="selo <%= i.imovelFinalidade %>"><%= i.imovelFinalidade == 'venda' ? 'Venda' : 'Aluguel' %></span></td>
+        <td><%= i.proprietarioNome %></td>
+        <td><%= Number(i.imovelPreco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></td>
+        <td>
+            <form action="/status/<%= i.imovelID %>" method="POST">
+                <% if (i.imovelStatus == 'disponivel') { %>
+                <button type="submit" class="pequeno"><%= i.imovelFinalidade == 'venda' ? 'Marcar vendido' : 'Marcar alugado' %></button>
+                <% } else { %>
+                <button type="submit" class="pequeno claro"><%= i.imovelStatus == 'vendido' ? '✓ Vendido' : '✓ Alugado' %></button>
+                <% } %>
+            </form>
+        </td>
+        <td class="acoes">
+            <a href="/editar/<%= i.imovelID %>#cadastro" class="pequeno claro">Editar</a>
+            <form action="/excluir/<%= i.imovelID %>" method="POST" onsubmit="return confirm('Excluir este imóvel?')">
+                <button type="submit" class="pequeno perigo">Excluir</button>
+            </form>
+        </td>
+    </tr>
+    <% }) %>
+</table>
+</div>
+<% } %>
 
-<label for="funcionarioSalario">Salário do Funcionário:</label><br>
-<input type="number" id="funcionarioSalario" name="funcionarioSalario"><br><br>
+<div class="caixa caixa-grande" id="cadastro">
+    <% if (imovel.imovelID) { %>
+    <h3>Editar imóvel</h3>
+    <form action="/editar/<%= imovel.imovelID %>" method="POST">
+    <% } else { %>
+    <h3>Cadastrar imóvel</h3>
+    <form action="/cadastrar" method="POST">
+    <% } %>
 
-<label for="pedidoData">Data do Pedido:</label><br>
-<input type="date" id="pedidoData" name="pedidoData"><br><br>
+        <h4>Dados do imóvel</h4>
 
-<label for="pedidoValorTotal">Valor Total do Pedido:</label><br>
-<input type="number" id="pedidoValorTotal" name="pedidoValorTotal"><br><br>
+        <label for="imovelTitulo">Título *</label>
+        <input type="text" id="imovelTitulo" name="imovelTitulo" value="<%= imovel.imovelTitulo %>" maxlength="100" required>
 
-<label for="pedidoFormaPagamento">Forma de Pagamento:</label><br>
-<select id="pedidoFormaPagamento" name="pedidoFormaPagamento">
-<option value="dinheiro">Dinheiro</option>
-<option value="pix">Pix</option>
-<option value="debito">Débito</option>
-<option value="credito">Crédito</option>
-</select><br><br>
+        <label for="imovelDescricao">Descrição</label>
+        <textarea id="imovelDescricao" name="imovelDescricao" rows="3"><%= imovel.imovelDescricao %></textarea>
 
-<label for="itemPedidoQuantidade">Quantidade do Item:</label><br>
-<input type="number" id="itemPedidoQuantidade" name="itemPedidoQuantidade"><br><br>
+        <div class="linha">
+            <div>
+                <label for="imovelTipo">Tipo *</label>
+                <select id="imovelTipo" name="imovelTipo" required>
+                    <option value="">Escolha...</option>
+                    <option <%= imovel.imovelTipo == 'Apartamento' ? 'selected' : '' %>>Apartamento</option>
+                    <option <%= imovel.imovelTipo == 'Casa' ? 'selected' : '' %>>Casa</option>
+                    <option <%= imovel.imovelTipo == 'Chácara' ? 'selected' : '' %>>Chácara</option>
+                    <option <%= imovel.imovelTipo == 'Kitnet' ? 'selected' : '' %>>Kitnet</option>
+                    <option <%= imovel.imovelTipo == 'Sala comercial' ? 'selected' : '' %>>Sala comercial</option>
+                    <option <%= imovel.imovelTipo == 'Terreno' ? 'selected' : '' %>>Terreno</option>
+                </select>
+            </div>
+            <div>
+                <label for="imovelFinalidade">Finalidade *</label>
+                <select id="imovelFinalidade" name="imovelFinalidade" required>
+                    <option value="venda" <%= imovel.imovelFinalidade == 'venda' ? 'selected' : '' %>>Venda</option>
+                    <option value="aluguel" <%= imovel.imovelFinalidade == 'aluguel' ? 'selected' : '' %>>Aluguel</option>
+                </select>
+            </div>
+        </div>
 
-<label for="itemPedidoPrecoUnitario">Preço Unitário do Item:</label><br>
-<input type="number" id="itemPedidoPrecoUnitario" name="itemPedidoPrecoUnitario"><br><br>
+        <div class="linha">
+            <div>
+                <label for="imovelPreco">Preço (R$) *</label>
+                <input type="number" id="imovelPreco" name="imovelPreco" value="<%= imovel.imovelPreco %>" min="1" step="0.01" required>
+            </div>
+            <div>
+                <label for="imovelArea">Área (m²) *</label>
+                <input type="number" id="imovelArea" name="imovelArea" value="<%= imovel.imovelArea %>" min="1" step="0.01" required>
+            </div>
+        </div>
 
-<label for="itemPedidoSubTotal">Subtotal do Item:</label><br>
-<input type="number" id="itemPedidoSubTotal" name="itemPedidoSubTotal"><br><br>
+        <div class="linha tres">
+            <div>
+                <label for="imovelQuartos">Quartos</label>
+                <input type="number" id="imovelQuartos" name="imovelQuartos" value="<%= imovel.imovelQuartos || 0 %>" min="0">
+            </div>
+            <div>
+                <label for="imovelBanheiros">Banheiros</label>
+                <input type="number" id="imovelBanheiros" name="imovelBanheiros" value="<%= imovel.imovelBanheiros || 0 %>" min="0">
+            </div>
+            <div>
+                <label for="imovelVagas">Vagas</label>
+                <input type="number" id="imovelVagas" name="imovelVagas" value="<%= imovel.imovelVagas || 0 %>" min="0">
+            </div>
+        </div>
 
-<button type="submit">Salvar</button>
-</form>
+        <div class="linha">
+            <div>
+                <label for="imovelEndereco">Endereço *</label>
+                <input type="text" id="imovelEndereco" name="imovelEndereco" value="<%= imovel.imovelEndereco %>" required>
+            </div>
+            <div>
+                <label for="imovelBairro">Bairro *</label>
+                <input type="text" id="imovelBairro" name="imovelBairro" value="<%= imovel.imovelBairro %>" required>
+            </div>
+        </div>
+
+        <label for="imovelImagemUrl">Link da foto</label>
+        <input type="url" id="imovelImagemUrl" name="imovelImagemUrl" value="<%= imovel.imovelImagemUrl %>" placeholder="https://...">
+
+        <label>Comodidades</label>
+        <div class="opcoes">
+            <% comodidades.forEach(c => { %>
+            <label class="opcao">
+                <input type="checkbox" name="comodidades" value="<%= c.comodidadeID %>" <%= marcadas.includes(c.comodidadeID) ? 'checked' : '' %>>
+                <%= c.comodidadeNome %>
+            </label>
+            <% }) %>
+        </div>
+
+        <h4>Proprietário</h4>
+
+        <label for="proprietarioNome">Nome *</label>
+        <input type="text" id="proprietarioNome" name="proprietarioNome" value="<%= imovel.proprietarioNome %>" required>
+
+        <div class="linha">
+            <div>
+                <label for="proprietarioCpf">CPF (só números) *</label>
+                <input type="text" id="proprietarioCpf" name="proprietarioCpf" value="<%= imovel.proprietarioCpf %>" minlength="11" maxlength="11" required>
+            </div>
+            <div>
+                <label for="proprietarioTelefone">Telefone *</label>
+                <input type="text" id="proprietarioTelefone" name="proprietarioTelefone" value="<%= imovel.proprietarioTelefone %>" required>
+            </div>
+        </div>
+
+        <button type="submit">Salvar</button>
+
+        <% if (imovel.imovelID) { %>
+        <a href="/formulario" class="cancelar">Cancelar</a>
+        <% } %>
+    </form>
+</div>
+
+<% } %>
 
 <%- include('partials/footer') %>
